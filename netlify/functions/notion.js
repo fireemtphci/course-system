@@ -207,3 +207,11 @@ exports.handler = async (event) => {
     };
   }
 };
+[build]
+  functions = "."
+  publish = "."
+
+[[redirects]]
+  from = "/api/notion"
+  to = "/.netlify/functions/notion"
+  status = 200
