@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>課程排程系統</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#18181b;--bg2:#27272a;--bg3:#3f3f46;
+  --border:#3f3f46;--border2:#52525b;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+  --purple:#7c3aed;--purple2:#6d28d9;
+  --green:#16a34a;--red:#dc2626;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);}
+body,input,select,textarea,button{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+.sc{display:none;}.sc.on{display:block;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;font-size:13px;cursor:pointer;color:var(--text);transition:background .12s;}
+.btn:hover{background:var(--bg2);}.btn:active{transform:scale(.98);}
+.btn-w{width:100%;justify-content:center;}
+.btn-adm{background:#581c87;color:#e9d5ff;border-color:#7e22ce;}.btn-adm:hover{background:#6b21a8;}
+.btn-ins{background:#134e4a;color:#99f6e4;border-color:#0f766e;}.btn-ins:hover{background:#0f766e;}
+.btn-pri{background:var(--purple);color:#fff;border-color:var(--purple2);}.btn-pri:hover{background:var(--purple2);}
+.btn-ok{border-color:#16a34a;color:#4ade80;}.btn-ok:hover{background:rgba(22,163,74,.15);}
+.btn-ng{border-color:#dc2626;color:#f87171;}.btn-ng:hover{background:rgba(220,38,38,.15);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.nav{display:flex;background:var(--bg);border-bottom:1px solid var(--border);padding:0 1rem;overflow-x:auto;}
+.nt{padding:.75rem .95rem;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:6px;}
+.nt.on{color:var(--text);border-bottom-color:var(--purple);font-weight:500;}
+.nt:hover:not(.on){color:var(--text);background:var(--bg2);}
+.pg{display:none;padding:1rem;}.pg.on{display:block;}
+.tb{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:var(--bg);border-bottom:1px solid var(--border);}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.av-p{background:#4c1d95;color:#ddd6fe;}.av-t{background:#134e4a;color:#99f6e4;}
+.av-c{background:#7c2d12;color:#fed7aa;}.av-b{background:#1e3a5f;color:#bae6fd;}.av-g{background:#14532d;color:#bbf7d0;}
+.card{background:var(--bg2);border-radius:12px;border:1px solid var(--border);padding:1.2rem;margin-bottom:.9rem;}
+.row{display:flex;align-items:center;gap:10px;padding:.65rem 0;border-bottom:1px solid var(--border);}
+.row:last-child{border-bottom:none;padding-bottom:0;}
+.ri{flex:1;}.rn{font-size:14px;font-weight:500;color:var(--text);}.rs{font-size:12px;color:var(--text2);margin-top:1px;}
+.stg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.st{background:var(--bg2);border-radius:10px;border:1px solid var(--border);padding:.9rem;text-align:center;}
+.sn{font-size:28px;font-weight:500;color:var(--text);}.sl{font-size:12px;color:var(--text2);margin-top:3px;}
+.stitle{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem;}
+.lbl{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:5px;display:block;}
+.fg{margin-bottom:.85rem;}
+input[type=text],input[type=email],input[type=password],input[type=date],select,textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+  color:var(--text);padding:7px 10px;font-size:13px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--purple);}
+textarea{resize:vertical;height:68px;}
+select option{background:var(--bg2);}
+.err{font-size:12px;color:#f87171;margin-top:4px;display:none;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tst{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#15803d;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;display:none;z-index:999;white-space:nowrap;}
+.tst.on{display:block;}
+.tst.err-t{background:#b91c1c;}
+.bdg{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;}
+.b-pu{background:#4c1d95;color:#ddd6fe;}.b-tl{background:#134e4a;color:#99f6e4;}
+.b-ok{background:rgba(22,163,74,.2);color:#4ade80;}
+.b-my{background:rgba(124,58,237,.25);color:#c4b5fd;}
+.b-fu{background:rgba(217,119,6,.2);color:#fcd34d;}
+.b-op{background:rgba(22,163,74,.15);color:#86efac;}
+.b-pe{background:rgba(217,119,6,.2);color:#fcd34d;}
+.nr{display:flex;align-items:flex-start;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--border);}
+.nr:last-child{border-bottom:none;}
+.nic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;}
+select.inst-select{width:auto;padding:5px 10px;font-size:13px;}
+.loading{text-align:center;padding:2rem;color:var(--text2);font-size:13px;}
+.step-row{display:flex;gap:6px;align-items:center;margin-bottom:1.1rem;}
+.sdot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:1px solid var(--border2);color:var(--text2);flex-shrink:0;}
+.sdot.act{background:var(--purple);color:#fff;border-color:var(--purple);}
+.sln{flex:1;height:0.5px;background:var(--border);}
+.cal-day{border-radius:6px;padding:3px;min-height:44px;border:1px solid transparent;}
+.cal-day.mine{background:rgba(124,58,237,.3);border-color:var(--purple);}
+.cal-day.other{background:var(--bg3);}
+.cal-day.today{border-color:var(--purple)!important;}
+.cal-day.om{opacity:.2;}
+</style>
+</head>
+<body>
+<div id="tst" class="tst"></div>
+
+<!-- 入口 -->
+<div class="sc on" id="s0">
+  <div style="max-width:300px;margin:3rem auto;text-align:center;">
+    <div style="width:52px;height:52px;border-radius:14px;background:#4c1d95;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+      <i class="ti ti-shield-check" style="font-size:26px;color:#ddd6fe;"></i>
+    </div>
+    <div style="font-size:20px;font-weight:500;margin-bottom:4px;">課程排程系統</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:1.75rem;">請選擇登入身份</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-adm btn-w" onclick="go('s-adm-login')"><i class="ti ti-shield-lock"></i> 管理員登入</button>
+      <button class="btn btn-ins btn-w" onclick="go('s-inst-login')"><i class="ti ti-user"></i> 教官登入</button>
+    </div>
+    <div style="margin-top:1rem;font-size:13px;color:var(--text2);">
+      尚未有帳號？<button class="btn btn-sm" style="display:inline-flex;padding:3px 10px;" onclick="go('s-apply')">申請加入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 管理員登入 -->
+<div class="sc" id="s-adm-login">
+  <div style="max-width:300px;margin:2.5rem auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.4rem;">
+      <button class="btn btn-sm" onclick="go('s0')"><i class="ti ti-arrow-left"></i></button>
+      <div style="font-size:15px;font-weight:500;">管理員登入</div>
+    </div>
+    <div class="card">
+      <div class="fg"><label class="lbl">帳號</label><input type="text" id="au" placeholder="管理員帳號"/></div>
+      <div class="fg"><label class="lbl">密碼</label><input type="password" id="ap" placeholder="••••••••"/><div class="err" id="aerr">帳號或密碼錯誤</div></div>
+      <button class="btn btn-adm btn-w" style="margin-top:.4rem;" onclick="admLogin()"><i class="ti ti-login"></i> 登入後台</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教官登入 -->
+<div class="sc" id="s-inst-login">
+  <div style="max-width:300px;margin:2.5rem auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.4rem;">
+      <button class="btn btn-sm" onclick="go('s0')"><i class="ti ti-arrow-left"></i></button>
+      <div style="font-size:15px;font-weight:500;">教官登入</div>
+    </div>
+    <div class="card">
+      <div class="fg"><label class="lbl">Email</label><input type="email" id="ie" placeholder="your@email.com"/></div>
+      <div class="fg"><label class="lbl">密碼</label><input type="password" id="ip" placeholder="••••••••"/><div class="err" id="ierr">帳號不存在或密碼錯誤</div></div>
+      <button class="btn btn-ins btn-w" style="margin-top:.4rem;" onclick="instLogin()"><i class="ti ti-login"></i> 登入</button>
+    </div>
+    <div style="text-align:center;margin-top:.75rem;font-size:13px;color:var(--text2);">
+      還沒帳號？<button class="btn btn-sm" style="display:inline-flex;padding:3px 10px;" onclick="go('s-apply')">申請加入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教官申請 -->
+<div class="sc" id="s-apply">
+  <div style="max-width:360px;margin:1.5rem auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+      <button class="btn btn-sm" onclick="go('s0')"><i class="ti ti-arrow-left"></i></button>
+      <div style="font-size:15px;font-weight:500;">申請加入系統</div>
+    </div>
+    <div class="step-row">
+      <div class="sdot act">1</div><span style="font-size:11px;color:var(--text);">填寫資料</span>
+      <div class="sln"></div>
+      <div class="sdot">2</div><span style="font-size:11px;color:var(--text2);">等待審核</span>
+      <div class="sln"></div>
+      <div class="sdot">3</div><span style="font-size:11px;color:var(--text2);">取得帳號</span>
+    </div>
+    <div class="card">
+      <div style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:.7rem .9rem;font-size:13px;color:#c4b5fd;margin-bottom:.85rem;">
+        <i class="ti ti-info-circle"></i> 申請送出後，管理員審核通過即可登入，約 1–3 個工作天。
+      </div>
+      <div class="g2">
+        <div class="fg" style="margin-bottom:0;"><label class="lbl">姓名</label><input type="text" id="ap-name" placeholder="王志明"/></div>
+        <div class="fg" style="margin-bottom:0;"><label class="lbl">職稱</label><input type="text" id="ap-title" placeholder="消防教官"/></div>
+      </div>
+      <div class="fg" style="margin-top:10px;"><label class="lbl">Email（登入帳號）</label><input type="email" id="ap-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label class="lbl">設定密碼</label><input type="password" id="ap-pw" placeholder="••••••••"/></div>
+      <button class="btn btn-pri btn-w" onclick="submitApply()"><i class="ti ti-send"></i> 送出申請</button>
+    </div>
+  </div>
+</div>
+
+<!-- 管理員後台 -->
+<div class="sc" id="s-adm">
+  <div class="tb">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:30px;height:30px;border-radius:50%;background:#4c1d95;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#ddd6fe;">管</div>
+      <span style="font-size:14px;font-weight:500;">後台管理</span>
+      <span class="bdg b-pu">管理員</span>
+    </div>
+    <button class="btn btn-sm btn-ng" onclick="logout()"><i class="ti ti-logout"></i> 登出</button>
+  </div>
+  <div class="nav">
+    <div class="nt on" onclick="aTab(this,'ap0')"><i class="ti ti-layout-dashboard"></i> 總覽</div>
+    <div class="nt" onclick="aTab(this,'ap1')"><i class="ti ti-clock"></i> 待審申請 <span id="pending-cnt" style="font-size:10px;background:rgba(217,119,6,.3);color:#fcd34d;padding:1px 5px;border-radius:9px;margin-left:3px;">0</span></div>
+    <div class="nt" onclick="aTab(this,'ap2')"><i class="ti ti-calendar-plus"></i> 建立課程</div>
+    <div class="nt" onclick="aTab(this,'ap3')"><i class="ti ti-clipboard-list"></i> 課程管理</div>
+    <div class="nt" onclick="aTab(this,'ap4')"><i class="ti ti-bell"></i> 通知</div>
+  </div>
+
+  <div id="ap0" class="pg on">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;">
+      <div class="st"><div class="sn" id="ds0">—</div><div class="sl">本月課程</div></div>
+      <div class="st"><div class="sn" id="ds1">—</div><div class="sl">待審申請</div></div>
+      <div class="st"><div class="sn" id="ds2">—</div><div class="sl">教官人數</div></div>
+    </div>
+    <div class="card" style="margin-bottom:.9rem;">
+      <div class="stitle">課程時段說明</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:100px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:.75rem 1rem;">
+          <div style="font-size:13px;font-weight:500;color:#c4b5fd;">時段 A</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px;">08:30 – 12:30</div>
+        </div>
+        <div style="flex:1;min-width:100px;background:rgba(13,148,136,.15);border:1px solid rgba(13,148,136,.3);border-radius:8px;padding:.75rem 1rem;">
+          <div style="font-size:13px;font-weight:500;color:#5eead4;">時段 B</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px;">13:30 – 17:30</div>
+        </div>
+        <div style="flex:1;min-width:100px;background:rgba(217,119,6,.15);border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:.75rem 1rem;">
+          <div style="font-size:13px;font-weight:500;color:#fcd34d;">全天</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px;">08:30 – 17:30</div>
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="stitle">課程總覽</div><div id="adm-ov"><div class="loading">載入中...</div></div></div>
+  </div>
+
+  <div id="ap1" class="pg">
+    <div class="card"><div class="stitle">待審核申請</div><div id="pending-list"><div class="loading">載入中...</div></div></div>
+  </div>
+
+  <div id="ap2" class="pg">
+    <div class="card">
+      <div class="stitle">新增課程</div>
+      <div class="fg"><label class="lbl">課程名稱</label><input type="text" id="cn" placeholder="例：急救訓練"/></div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">課程日期</label><input type="date" id="cdt"/></div>
+        <div class="fg"><label class="lbl">時段</label>
+          <select id="ctm">
+            <option value="時段A：08:30–12:30">時段A：08:30–12:30</option>
+            <option value="時段B：13:30–17:30">時段B：13:30–17:30</option>
+            <option value="全天">全天</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">地點</label>
+          <select id="clc"><option>訓練中心A館</option><option>訓練中心B館</option><option>戶外訓練場</option><option>第一會議室</option><option>第二會議室</option></select>
+        </div>
+        <div class="fg"><label class="lbl">名額上限</label>
+          <select id="cq"><option value="1">1 位</option><option value="2" selected>2 位</option><option value="3">3 位</option><option value="4">4 位</option><option value="5">5 位</option></select>
+        </div>
+      </div>
+      <button class="btn btn-pri" onclick="addCourse()"><i class="ti ti-plus"></i> 新增課程</button>
+    </div>
+  </div>
+
+  <div id="ap3" class="pg">
+    <div class="card"><div class="stitle">現有課程</div><div id="adm-courses"><div class="loading">載入中...</div></div></div>
+  </div>
+
+  <div id="ap4" class="pg">
+    <div class="card" style="margin-bottom:.75rem;">
+      <div class="stitle">發送課程通知</div>
+      <div class="fg"><label class="lbl">課程</label><select id="ns"><option>請先至課程管理載入課程</option></select></div>
+      <div class="fg"><label class="lbl">通知對象</label>
+        <select id="ntg"><option>全體教官</option><option>已選課教官</option></select>
+      </div>
+      <div class="fg"><label class="lbl">通知內容</label><textarea id="nm" placeholder="請填寫通知訊息..."></textarea></div>
+      <button class="btn btn-pri" onclick="sendNotify()"><i class="ti ti-send"></i> 發送通知</button>
+    </div>
+    <div class="card"><div class="stitle">通知紀錄</div><div id="notify-log"><div class="loading">載入中...</div></div></div>
+  </div>
+</div>
+
+<!-- 教官介面 -->
+<div class="sc" id="s-inst">
+  <div class="tb">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="av av-p" id="iav">王</div>
+      <div>
+        <div style="font-size:14px;font-weight:500;" id="inm">教官</div>
+        <div style="font-size:11px;color:var(--text2);" id="itl"></div>
+      </div>
+      <span class="bdg b-tl">教官</span>
+    </div>
+    <button class="btn btn-sm btn-ng" onclick="logout()"><i class="ti ti-logout"></i> 登出</button>
+  </div>
+  <div class="nav">
+    <div class="nt on" onclick="iTab(this,'ip0')"><i class="ti ti-user-check"></i> 教官選課</div>
+    <div class="nt" onclick="iTab(this,'ip1');renderCal()"><i class="ti ti-calendar"></i> 課程月曆</div>
+    <div class="nt" onclick="iTab(this,'ip2')"><i class="ti ti-settings"></i> 我的課程</div>
+    <div class="nt" onclick="iTab(this,'ip3')"><i class="ti ti-bell"></i> 通知紀錄</div>
+  </div>
+
+  <div id="ip0" class="pg on">
+    <div class="stg">
+      <div class="st"><div class="sn" id="i-tot">—</div><div class="sl">本月課程數</div></div>
+      <div class="st"><div class="sn" id="i-my">—</div><div class="sl">我的已選課程</div></div>
+    </div>
+    <div class="card">
+      <div class="section-header">
+        <div class="stitle" style="margin-bottom:0;" id="month-label">本月可選課程</div>
+        <select class="inst-select" id="inst-sw" onchange="swInst()"></select>
+      </div>
+      <div style="height:.65rem;"></div>
+      <div id="inst-list"><div class="loading">載入中...</div></div>
+    </div>
+  </div>
+
+  <div id="ip1" class="pg">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;">
+        <button class="btn btn-sm" onclick="chgM(-1)"><i class="ti ti-chevron-left"></i></button>
+        <span style="font-size:15px;font-weight:500;" id="mdisp"></span>
+        <button class="btn btn-sm" onclick="chgM(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:.65rem;font-size:12px;color:var(--text2);">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(124,58,237,.35);border:1px solid var(--purple);display:inline-block;"></span>我的課程</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--bg3);border:1px solid var(--border2);display:inline-block;"></span>其他課程</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;" id="calgrid"></div>
+    </div>
+    <div class="card"><div class="stitle">我的課程清單</div><div id="mycallist"></div></div>
+  </div>
+
+  <div id="ip2" class="pg">
+    <div class="card"><div class="stitle">已選課程詳情</div><div id="inst-detail"><div class="loading">載入中...</div></div></div>
+  </div>
+
+  <div id="ip3" class="pg">
+    <div class="card"><div class="stitle">系統通知</div><div id="inst-notif"><div class="loading">載入中...</div></div></div>
+  </div>
+</div>
+
+<script>
+// ===== 設定 =====
+var ADMIN_USER = 'admin';
+var ADMIN_PASS = 'admin1234';  // 請修改為你的管理員密碼
+var API = '/api/notion';
+var MN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+var TL = {'時段A：08:30–12:30':'時段A','時段B：13:30–17:30':'時段B','全天':'全天'};
+var DOTS = ['#7c3aed','#0d9488','#d97706','#dc2626','#16a34a','#2563eb','#db2777','#059669'];
+var AVC = ['av-p','av-t','av-c','av-b','av-g'];
+
+var allInstructors = [];
+var allCourses = [];
+var allEnrollments = [];
+var calY = new Date().getFullYear();
+var calM = new Date().getMonth();
+var curInst = null;
+
+function go(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on');});document.getElementById(id).classList.add('on');}
+function toast(msg,err){var t=document.getElementById('tst');t.textContent=msg;t.classList.add('on');t.classList.toggle('err-t',!!err);setTimeout(function(){t.classList.remove('on');},3000);}
+function logout(){go('s0');curInst=null;}
+function pad(n){return n<10?'0'+n:String(n);}
+
+async function api(action, data) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action, data})
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+
+// ===== 管理員登入 =====
+async function admLogin(){
+  var u=document.getElementById('au').value.trim();
+  var p=document.getElementById('ap').value;
+  var e=document.getElementById('aerr');
+  if(u===ADMIN_USER&&p===ADMIN_PASS){
+    e.style.display='none';
+    await loadAdmData();
+    go('s-adm');
+  }else{e.style.display='block';}
+}
+
+async function loadAdmData(){
+  try{
+    allInstructors = await api('getInstructors');
+    allCourses = await api('getCourses');
+    allEnrollments = await api('getEnrollments');
+    var pending = await api('getPendingInstructors');
+    document.getElementById('ds0').textContent = allCourses.length;
+    document.getElementById('ds1').textContent = pending.length;
+    document.getElementById('ds2').textContent = allInstructors.length;
+    document.getElementById('pending-cnt').textContent = pending.length;
+    renderAdmOv();
+  }catch(e){toast('載入失敗：'+e.message,true);}
+}
+
+function renderAdmOv(){
+  var el=document.getElementById('adm-ov');
+  if(!allCourses.length){el.innerHTML='<div style="font-size:13px;color:var(--text2);">尚無課程</div>';return;}
+  el.innerHTML=allCourses.map(function(c,i){
+    var enrolled=allEnrollments.filter(function(e){return e.courseName===c.name;});
+    return '<div class="row"><div style="width:8px;height:8px;border-radius:50%;background:'+DOTS[i%DOTS.length]+';flex-shrink:0;"></div>'
+      +'<div class="ri"><div class="rn">'+c.name+'</div>'
+      +'<div class="rs"><i class="ti ti-calendar"></i> '+c.date+' <i class="ti ti-clock" style="margin-left:6px;"></i> '+c.time+' <i class="ti ti-map-pin" style="margin-left:6px;"></i> '+c.location+'</div>'
+      +'<div class="rs">已選：'+enrolled.length+'/'+c.quota+' 位</div></div></div>';
+  }).join('');
+}
+
+function aTab(el,id){
+  document.querySelectorAll('#s-adm .nt').forEach(function(t){t.classList.remove('on');});el.classList.add('on');
+  document.querySelectorAll('#s-adm .pg').forEach(function(p){p.classList.remove('on');});document.getElementById(id).classList.add('on');
+  if(id==='ap1')renderPendingList();
+  if(id==='ap3')renderAdmCourses();
+  if(id==='ap4')renderNotifyPanel();
+}
+
+async function renderPendingList(){
+  var el=document.getElementById('pending-list');
+  try{
+    var pending=await api('getPendingInstructors');
+    if(!pending.length){el.innerHTML='<div style="font-size:13px;color:var(--text2);">目前無待審申請</div>';return;}
+    el.innerHTML=pending.map(function(p,i){
+      return '<div class="row" style="align-items:flex-start;padding:.8rem 0;">'
+        +'<div class="av '+AVC[i%AVC.length]+'" style="margin-top:2px;">'+p.name[0]+'</div>'
+        +'<div class="ri"><div class="rn">'+p.name+'</div>'
+        +'<div class="rs">'+p.title+' · '+p.email+'</div>'
+        +'<div class="rs">申請日期：'+p.applyDate+'</div>'
+        +'<div style="display:flex;gap:8px;margin-top:7px;">'
+        +'<button class="btn btn-sm btn-ok" onclick="approveInst(\''+p.id+'\',\''+p.name+'\')"><i class="ti ti-check"></i> 核准</button>'
+        +'<button class="btn btn-sm btn-ng" onclick="rejectInst(\''+p.id+'\',\''+p.name+'\')"><i class="ti ti-x"></i> 拒絕</button>'
+        +'</div></div></div>';
+    }).join('');
+  }catch(e){el.innerHTML='<div style="font-size:13px;color:#f87171;">載入失敗</div>';}
+}
+
+async function approveInst(id,name){
+  try{
+    await api('approveInstructor',{id});
+    toast('✓ 已核准 '+name);
+    renderPendingList();
+    loadAdmData();
+  }catch(e){toast('操作失敗',true);}
+}
+async function rejectInst(id,name){
+  try{
+    await api('rejectInstructor',{id});
+    toast('已拒絕 '+name+' 的申請');
+    renderPendingList();
+  }catch(e){toast('操作失敗',true);}
+}
+
+function renderAdmCourses(){
+  var el=document.getElementById('adm-courses');
+  if(!allCourses.length){el.innerHTML='<div style="font-size:13px;color:var(--text2);">尚無課程</div>';return;}
+  el.innerHTML=allCourses.map(function(c,i){
+    var enrolled=allEnrollments.filter(function(e){return e.courseName===c.name;});
+    return '<div class="row"><div style="width:8px;height:8px;border-radius:50%;background:'+DOTS[i%DOTS.length]+';flex-shrink:0;"></div>'
+      +'<div class="ri"><div class="rn">'+c.name+'</div>'
+      +'<div class="rs"><i class="ti ti-calendar"></i> '+c.date+' <i class="ti ti-clock" style="margin-left:4px;"></i> '+c.time+' <i class="ti ti-map-pin" style="margin-left:4px;"></i> '+c.location+' <i class="ti ti-users" style="margin-left:4px;"></i> '+enrolled.length+'/'+c.quota+'</div></div>'
+      +'<button class="btn btn-sm btn-ng" onclick="deleteCourse(\''+c.id+'\',\''+c.name+'\')"><i class="ti ti-trash"></i></button></div>';
+  }).join('');
+  var sel=document.getElementById('ns');
+  if(sel)sel.innerHTML=allCourses.map(function(c){return '<option>'+c.name+' ('+c.date+')</option>';}).join('');
+}
+
+async function addCourse(){
+  var name=document.getElementById('cn').value.trim(),date=document.getElementById('cdt').value;
+  if(!name||!date){toast('請填寫課程名稱與日期',true);return;}
+  var time=document.getElementById('ctm').value,location=document.getElementById('clc').value;
+  var quota=parseInt(document.getElementById('cq').value)||2;
+  try{
+    await api('addCourse',{name,date,time,location,quota});
+    document.getElementById('cn').value='';document.getElementById('cdt').value='';
+    toast('✓ 課程「'+name+'」已新增');
+    allCourses=await api('getCourses');
+    renderAdmOv();
+  }catch(e){toast('新增失敗',true);}
+}
+
+async function deleteCourse(id,name){
+  if(!confirm('確定刪除「'+name+'」？'))return;
+  try{
+    await api('deleteCourse',{id});
+    toast('已刪除：'+name);
+    allCourses=await api('getCourses');
+    renderAdmCourses();renderAdmOv();
+  }catch(e){toast('刪除失敗',true);}
+}
+
+async function renderNotifyPanel(){
+  var el=document.getElementById('notify-log');
+  try{
+    var notifs=await api('getNotifications');
+    if(!notifs.length){el.innerHTML='<div style="font-size:13px;color:var(--text2);">尚無通知紀錄</div>';return;}
+    el.innerHTML=notifs.map(function(n){
+      return '<div class="nr"><div class="nic" style="background:rgba(124,58,237,.2);"><i class="ti ti-bell" style="font-size:15px;color:#c4b5fd;"></i></div>'
+        +'<div class="ri"><div class="rn">'+n.title+'</div><div class="rs">'+n.content+'</div></div>'
+        +'<div style="font-size:11px;color:var(--text3);white-space:nowrap;">'+(n.time?n.time.slice(0,10):'')+'</div></div>';
+    }).join('');
+  }catch(e){el.innerHTML='<div style="font-size:13px;color:#f87171;">載入失敗</div>';}
+}
+
+async function sendNotify(){
+  var sel=document.getElementById('ns'),tsel=document.getElementById('ntg');
+  if(!sel.value||sel.value==='請先至課程管理載入課程'){toast('請先建立課程',true);return;}
+  var title=sel.value,target=tsel.value,content=document.getElementById('nm').value.trim();
+  if(!content){toast('請填寫通知內容',true);return;}
+  try{
+    await api('addNotification',{title,content,target});
+    document.getElementById('nm').value='';
+    toast('✓ 通知已發送給 '+target);
+    renderNotifyPanel();
+  }catch(e){toast('發送失敗',true);}
+}
+
+// ===== 教官登入 =====
+async function instLogin(){
+  var em=document.getElementById('ie').value.trim(),p=document.getElementById('ip').value;
+  var err=document.getElementById('ierr');
+  try{
+    var instructors=await api('getInstructors');
+    var found=instructors.find(function(i){return i.email===em&&i.password===p;});
+    if(found){
+      err.style.display='none';curInst=found;
+      allInstructors=instructors;
+      allCourses=await api('getCourses');
+      allEnrollments=await api('getEnrollments');
+      document.getElementById('iav').textContent=found.name[0];
+      document.getElementById('iav').className='av '+AVC[Math.abs(found.name.charCodeAt(0))%AVC.length];
+      document.getElementById('inm').textContent=found.name;
+      document.getElementById('itl').textContent=found.title;
+      var now2=new Date();
+      document.getElementById('month-label').textContent='本月可選課程 — '+now2.getFullYear()+'年'+MN[now2.getMonth()];
+      buildInstSw();renderInstList();renderInstDetail();renderInstNotif();
+      go('s-inst');
+    }else{err.style.display='block';}
+  }catch(e){err.style.display='block';}
+}
+
+function buildInstSw(){
+  var sel=document.getElementById('inst-sw');
+  sel.innerHTML=allInstructors.map(function(inst,i){return '<option value="'+i+'">'+inst.name+' 教官</option>';}).join('');
+  for(var i=0;i<allInstructors.length;i++){
+    if(allInstructors[i].email===curInst.email){sel.selectedIndex=i;break;}
+  }
+}
+function swInst(){
+  var idx=parseInt(document.getElementById('inst-sw').value);
+  if(isNaN(idx)||!allInstructors[idx])return;
+  curInst=allInstructors[idx];
+  document.getElementById('iav').textContent=curInst.name[0];
+  document.getElementById('inm').textContent=curInst.name;
+  document.getElementById('itl').textContent=curInst.title;
+  renderInstList();renderInstDetail();
+}
+
+function iTab(el,id){
+  document.querySelectorAll('#s-inst .nt').forEach(function(t){t.classList.remove('on');});el.classList.add('on');
+  document.querySelectorAll('#s-inst .pg').forEach(function(p){p.classList.remove('on');});document.getElementById(id).classList.add('on');
+}
+
+function getMyEnrollments(){
+  return allEnrollments.filter(function(e){return e.instructorEmail===curInst.email;});
+}
+
+function renderInstList(){
+  if(!curInst)return;
+  var myE=getMyEnrollments();
+  document.getElementById('i-tot').textContent=allCourses.length;
+  document.getElementById('i-my').textContent=myE.length;
+  var el=document.getElementById('inst-list');
+  if(!allCourses.length){el.innerHTML='<div style="font-size:13px;color:var(--text2);">目前沒有開放中的課程</div>';return;}
+  el.innerHTML=allCourses.map(function(c,i){
+    var enrolled=allEnrollments.filter(function(e){return e.courseName===c.name;});
+    var myEn=myE.find(function(e){return e.courseName===c.name;});
+    var isMine=!!myEn;
+    var isFull=enrolled.length>=c.quota;
+    var badge=isMine?'<span class="bdg b-my">已選課</span>':(isFull?'<span class="bdg b-fu">已額滿</span>':'<span class="bdg b-op">開放中</span>');
+    var btn=isMine
+      ?'<button class="btn btn-sm btn-ng" onclick="desel(\''+myEn.id+'\',\''+c.name+'\')">退選</button>'
+      :(isFull?'':'<button class="btn btn-sm btn-ok" onclick="sel(\''+c.name+'\')">選課</button>');
+    return '<div class="row" style="align-items:flex-start;padding:.75rem 0;">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+DOTS[i%DOTS.length]+';flex-shrink:0;margin-top:5px;"></div>'
+      +'<div class="ri"><div class="rn">'+c.name+'</div>'
+      +'<div class="rs"><i class="ti ti-calendar"></i> '+c.date+' <i class="ti ti-clock" style="margin-left:4px;"></i> '+c.time+'</div>'
+      +'<div class="rs"><i class="ti ti-map-pin"></i> '+c.location+' <i class="ti ti-users" style="margin-left:4px;"></i> '+enrolled.length+'/'+c.quota+'</div>'
+      +'</div>'+badge+' '+btn+'</div>';
+  }).join('');
+}
+
+async function sel(courseName){
+  if(!curInst)return;
+  try{
+    await api('enroll',{instructorEmail:curInst.email,courseName});
+    toast('✓ 已選課：'+courseName);
+    allEnrollments=await api('getEnrollments');
+    renderInstList();renderInstDetail();
+    document.getElementById('i-my').textContent=getMyEnrollments().length;
+  }catch(e){toast('選課失敗',true);}
+}
+async function desel(enrollId,courseName){
+  if(!curInst)return;
+  try{
+    await api('unenroll',{id:enrollId});
+    toast('已退選：'+courseName);
+    allEnrollments=await api('getEnrollments');
+    renderInstList();renderInstDetail();
+    document.getElementById('i-my').textContent=getMyEnrollments().length;
+  }catch(e){toast('退選失敗',true);}
+}
+
+function renderInstDetail(){
+  if(!curInst)return;
+  var myE=getMyEnrollments();
+  var el=document.getElementById('inst-detail');
+  el.innerHTML=myE.length===0?'<div style="font-size:13px;color:var(--text2);">尚未選課</div>'
+    :myE.map(function(e,i){
+      var c=allCourses.find(function(x){return x.name===e.courseName;})||{};
+      return '<div class="row"><div style="width:8px;height:8px;border-radius:50%;background:'+DOTS[i%DOTS.length]+';flex-shrink:0;"></div>'
+        +'<div class="ri"><div class="rn">'+e.courseName+'</div>'
+        +'<div class="rs">'+(c.date||'')+(c.time?' · '+c.time:'')+(c.location?' · '+c.location:'')+'</div></div>'
+        +'<button class="btn btn-sm btn-ng" onclick="desel(\''+e.id+'\',\''+e.courseName+'\')">退選</button></div>';
+    }).join('');
+}
+
+function renderCal(){
+  if(!curInst)return;
+  var me=curInst.email;
+  var myE=getMyEnrollments();
+  var myNames=myE.map(function(e){return e.courseName;});
+  document.getElementById('mdisp').textContent=calY+'年'+MN[calM];
+  var first=new Date(calY,calM,1).getDay(),days=new Date(calY,calM+1,0).getDate();
+  var today=new Date();
+  var h=['日','一','二','三','四','五','六'].map(function(d){return '<div style="text-align:center;font-size:11px;color:var(--text3);padding:3px;">'+d+'</div>';}).join('');
+  for(var i=0;i<first;i++)h+='<div class="cal-day om"></div>';
+  for(var d=1;d<=days;d++){
+    var ds=calY+'-'+pad(calM+1)+'-'+pad(d);
+    var myCs=allCourses.filter(function(c){return c.date===ds&&myNames.indexOf(c.name)>=0;});
+    var otherCs=allCourses.filter(function(c){return c.date===ds&&myNames.indexOf(c.name)<0;});
+    var isTd=today.getFullYear()===calY&&today.getMonth()===calM&&today.getDate()===d;
+    var cls='cal-day'+(myCs.length?' mine':(otherCs.length?' other':''))+(isTd?' today':'');
+    h+='<div class="'+cls+'"><span style="font-size:11px;font-weight:500;color:var(--text);">'+d+'</span>'
+      +myCs.map(function(c){return '<div style="font-size:9px;color:#c4b5fd;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+c.name+'</div>';}).join('')
+      +(otherCs.length&&!myCs.length?'<div style="font-size:9px;color:var(--text3);">+'+otherCs.length+'堂</div>':'')+'</div>';
+  }
+  document.getElementById('calgrid').innerHTML=h;
+  var myList=allCourses.filter(function(c){var mo=parseInt(c.date.slice(5,7))-1;var y=parseInt(c.date.slice(0,4));return y===calY&&mo===calM&&myNames.indexOf(c.name)>=0;});
+  var ml=document.getElementById('mycallist');
+  ml.innerHTML=myList.length===0?'<div style="font-size:13px;color:var(--text2);">本月尚無已選課程</div>'
+    :myList.map(function(c,i){return '<div class="row"><div style="width:8px;height:8px;border-radius:50%;background:'+DOTS[i%DOTS.length]+';flex-shrink:0;"></div><div class="ri"><div class="rn">'+c.name+'</div><div class="rs">'+c.date+' · '+c.time+' · '+c.location+'</div></div></div>';}).join('');
+}
+function chgM(d){calM+=d;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;}renderCal();}
+
+async function renderInstNotif(){
+  var el=document.getElementById('inst-notif');
+  try{
+    var notifs=await api('getNotifications');
+    el.innerHTML=notifs.length===0?'<div style="font-size:13px;color:var(--text2);">目前沒有通知</div>'
+      :notifs.map(function(n){return '<div class="nr"><div class="nic" style="background:rgba(124,58,237,.2);"><i class="ti ti-bell" style="font-size:15px;color:#c4b5fd;"></i></div><div class="ri"><div class="rn">'+n.title+'</div><div class="rs">'+n.content+'</div></div><div style="font-size:11px;color:var(--text3);white-space:nowrap;">'+(n.time?n.time.slice(0,10):'')+'</div></div>';}).join('');
+  }catch(e){el.innerHTML='<div style="font-size:13px;color:#f87171;">載入失敗</div>';}
+}
+
+// ===== 申請加入 =====
+async function submitApply(){
+  var name=document.getElementById('ap-name').value.trim();
+  var title=document.getElementById('ap-title').value.trim();
+  var email=document.getElementById('ap-email').value.trim();
+  var pw=document.getElementById('ap-pw').value.trim();
+  if(!name||!email||!pw){toast('請填寫所有必填欄位',true);return;}
+  var today=new Date().toISOString().slice(0,10);
+  try{
+    await api('applyInstructor',{name,title,email,password:pw,applyDate:today});
+    toast('✓ 申請已送出，請等待管理員審核');
+    document.getElementById('ap-name').value='';
+    document.getElementById('ap-title').value='';
+    document.getElementById('ap-email').value='';
+    document.getElementById('ap-pw').value='';
+    setTimeout(function(){go('s0');},2000);
+  }catch(e){toast('申請失敗，請稍後再試',true);}
+}
+</script>
+</body>
+</html>
